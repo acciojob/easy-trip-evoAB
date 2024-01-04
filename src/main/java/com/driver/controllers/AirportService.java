@@ -30,10 +30,10 @@ public class AirportService {
     public int calculateFlightFare(int flightId){
         return airportRepository.calculateFlightFare(flightId);
     }
-    public int bookATicket(int flightId, int passangerId){
+    public String bookATicket(int flightId, int passangerId){
         return airportRepository.bookATicket(flightId, passangerId);
     }
-    public boolean cancelATicket(int flightId, int passangerId){
+    public String cancelATicket(int flightId, int passangerId){
         return airportRepository.cancelATicket(flightId, passangerId);
     }
     public int countOfBookingsDoneByPassengerAllCombined(int passangerId){
