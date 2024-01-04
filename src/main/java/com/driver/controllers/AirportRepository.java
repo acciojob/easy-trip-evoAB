@@ -42,9 +42,9 @@ public class AirportRepository {
             if (flight.getFromCity().equals(fromCity) && flight.getToCity().equals(toCity))
                 minTime=Math.min(minTime, flight.getDuration());
         }
-        if (minTime==Double.MAX_VALUE)
-            return -1;
-        return minTime;
+        if (minTime!=Double.MAX_VALUE)
+            return minTime;
+        return -1;
     }
     public int getNumberOfPeopleOn(Date date, String airportName){
         if(!airportDB.containsKey(airportName))
@@ -109,8 +109,13 @@ public class AirportRepository {
         return null;
     }
     public int calculateRevenueOfAFlight(int flightId){
-        int actualRevenue = passengerFlightDB.get(flightId).size()*50;
-        return 3000+(actualRevenue);
+
+        int noOfPeopleBooked = passengerFlightDB.get(flightId).size();
+        int variableFare = (noOfPeopleBooked*(noOfPeopleBooked+1))*25;
+        int fixedFare = 3000*noOfPeopleBooked;
+        int totalFare = variableFare + fixedFare;
+
+        return totalFare;
     }
     public void addPassenger(Passenger passenger){
         passengerDB.put(passenger.getPassengerId(),passenger);
