@@ -65,7 +65,7 @@ public class AirportRepository {
     public int bookATicket(int flightId, int passengerId){
         if(!passengerFlightDB.containsKey(flightId))
             return -1;
-        if (passengerFlightDB.get(flightId).get(passengerId)!=-1)
+        if (!passengerFlightDB.get(flightId).contains(passengerId))
             return -1;
         if(flightDB.get(flightId).getMaxCapacity()<=passengerFlightDB.get(flightId).size())
             return -1;
@@ -80,7 +80,7 @@ public class AirportRepository {
     public boolean cancelATicket(int flightId, int passangerId){
         if(!passengerFlightDB.containsKey(flightId))
             return false;
-        if (passengerFlightDB.get(flightId).get(passangerId)!=-1)
+        if (!passengerFlightDB.get(flightId).contains(passangerId))
             return false;
         List<Integer> passengers = passengerFlightDB.get(flightId);
         passengers.remove(passangerId);
