@@ -7,10 +7,7 @@ import com.driver.model.Flight;
 import com.driver.model.Passenger;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class AirportRepository {
@@ -30,9 +27,9 @@ public class AirportRepository {
         int max  = f.getMaxCapacity();
         List<Integer> temp  = tDb.getOrDefault(fightId , new ArrayList<>());
         if(temp.size()>max) return "FAILURE";
-        if(temp.size()>0) {
+        if(!temp.isEmpty()) {
             for (Integer i : temp) {
-                if (i == passengerId)
+                if (Objects.equals(i, passengerId))
                     return "FAILURE";
             }
         }
@@ -64,14 +61,14 @@ public class AirportRepository {
     {
         String pans=list.get(0);
         for(String s:list){
-            if(s.compareToIgnoreCase(pans)<0)pans=s;
+            if(s.compareToIgnoreCase(pans)<0)
+                pans=s;
         }
         return pans;
     }
 
-    public String addFlight(Flight f){
+    public void addFlight(Flight f){
         fDb.put(f.getFlightId() , f);
-        return "SUCCESS";
     }
 
     public double getShortestDurationOfPossibleBetweenTwoCities(City from ,City to){
@@ -119,9 +116,9 @@ public class AirportRepository {
         if(!fDb.containsKey(fId)) return "FAILURE";
         List<Integer> temp  = tDb.getOrDefault(fId , new ArrayList<>());
         int s  = -1;
-        if(temp.size()>0) {
+        if(!temp.isEmpty()) {
             for (Integer i : temp) {
-                if (i == pId) {
+                if (Objects.equals(i, pId)) {
                     s = pId;
                     break;
                 }
@@ -129,7 +126,6 @@ public class AirportRepository {
             if (s == -1) return "FAILURE";
         }
         else{
-            temp.remove(pId);
             tDb.put(fId , temp);
         }
         return "SUCCESS";
@@ -140,7 +136,7 @@ public class AirportRepository {
         for(Integer f : tDb.keySet()){
             List<Integer> temp = tDb.get(f);
             for(Integer i : temp){
-                if(i==pId)
+                if(Objects.equals(i, pId))
                     count++;
             }
         }
@@ -164,7 +160,7 @@ public class AirportRepository {
     public int calculateRevenueOfAFlight(Integer fId){
         int pans  = 0;
         List<Integer> temp  = tDb.get(fId);
-        if(temp.size()==0){
+        if(temp.isEmpty()){
             return 0;
         }
         for(int i = 0;i<temp.size();i++){
