@@ -44,9 +44,10 @@ public class AirportRepository {
         return -1;
     }
     public int getNumberOfPeopleOn(Date date, String airportName){
-        if(!airportDB.containsKey(airportName))
-            return 0;
         Airport airport = airportDB.get(airportName);
+        if(Objects.isNull(airport)){
+            return 0;
+        }
         City city=airport.getCity();
         int count=0;
         for (Flight flight:flightDB.values()){
@@ -102,20 +103,44 @@ public class AirportRepository {
         return -1;
     }
     public boolean cancelATicket(int flightId, int passangerId){
-        if(!passengerFlightDB.containsKey(flightId))
-            return false;
-        if (!passengerFlightDB.get(flightId).contains(passangerId))
-            return false;
+//        if(!passengerFlightDB.containsKey(flightId))
+//            return false;
+//        if (!passengerFlightDB.get(flightId).contains(passangerId))
+//            return false;
+//        List<Integer> passengers = passengerFlightDB.get(flightId);
+//        passengers.remove(passangerId);
+//        return true;
         List<Integer> passengers = passengerFlightDB.get(flightId);
-        passengers.remove(passangerId);
-        return true;
+        if(passengers == null){
+            return false;
+        }
+
+
+        if(passengers.contains(passangerId)){
+            passengers.remove(passangerId);
+            return true;
+        }
+        return false;
     }
     public int countOfBookingsDoneByPassengerAllCombined(int passangerId){
-        int count=0;
-        for (List <Integer> passangers : passengerFlightDB.values()){
-            for (int passanger : passangers)
-                if(passangerId==passanger)
+//        int count=0;
+//        for (List <Integer> passangers : passengerFlightDB.values()){
+//            for (int passanger : passangers)
+//                if(passangerId==passanger)
+//                    count++;
+//        }
+//        return count;
+        HashMap<Integer,List<Integer>> passengerToFlightDb = new HashMap<>();
+        //We have a list from passenger To flights database:-
+        int count = 0;
+        for(Map.Entry<Integer,List<Integer>> entry: passengerFlightDB.entrySet()){
+
+            List<Integer> passengers  = entry.getValue();
+            for(Integer passenger : passengers){
+                if(passenger==passangerId){
                     count++;
+                }
+            }
         }
         return count;
     }
@@ -126,7 +151,7 @@ public class AirportRepository {
         if(flightDB.containsKey(flightId)){
             City city = flightDB.get(flightId).getFromCity();
             for (Airport airport : airportDB.values()){
-                if(city.equals(airport.getCity()))
+                if(airport.getCity().equals(city))
                     return airport.getAirportName();
             }
         }
