@@ -7,10 +7,7 @@ import com.driver.model.Passenger;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class AirportRepository {
@@ -63,19 +60,46 @@ public class AirportRepository {
         return 3000 + passengerFlightDB.get(flightId).size()*50;
     }
     public int bookATicket(int flightId, int passengerId){
-        if(!passengerFlightDB.containsKey(flightId))
-            return -1;
-        if (!passengerFlightDB.get(flightId).contains(passengerId))
-            return -1;
-        if(flightDB.get(flightId).getMaxCapacity()<=passengerFlightDB.get(flightId).size())
-            return -1;
+//        if(!passengerFlightDB.containsKey(flightId))
+//            return -1;
+//        if (!passengerFlightDB.get(flightId).contains(passengerId))
+//            return -1;
+//        if(flightDB.get(flightId).getMaxCapacity()<=passengerFlightDB.get(flightId).size())
+//            return -1;
+//
+//        List<Integer> passengers = passengerFlightDB.get(flightId);
+//        if(passengers==null)
+//            passengers = new ArrayList<>();
+//        passengers.add(passengerId);
+//        passengerFlightDB.put(flightId,passengers);
+//        return 1;
+        if(Objects.nonNull(passengerFlightDB.get(flightId)) &&(passengerFlightDB.get(flightId).size()<flightDB.get(flightId).getMaxCapacity())){
 
-        List<Integer> passengers = passengerFlightDB.get(flightId);
-        if(passengers==null)
-            passengers = new ArrayList<>();
-        passengers.add(passengerId);
-        passengerFlightDB.put(flightId,passengers);
-        return 1;
+
+            List<Integer> passengers =  passengerFlightDB.get(flightId);
+
+            if(passengers.contains(passengerId)){
+                return -1;
+            }
+
+            passengers.add(passengerId);
+            passengerFlightDB.put(flightId,passengers);
+            return 1;
+        }
+        else if(Objects.isNull(passengerFlightDB.get(flightId))){
+            passengerFlightDB.put(flightId,new ArrayList<>());
+            List<Integer> passengers =  passengerFlightDB.get(flightId);
+
+            if(passengers.contains(passengerId)){
+                return -1;
+            }
+
+            passengers.add(passengerId);
+            passengerFlightDB.put(flightId,passengers);
+            return 1;
+
+        }
+        return -1;
     }
     public boolean cancelATicket(int flightId, int passangerId){
         if(!passengerFlightDB.containsKey(flightId))
