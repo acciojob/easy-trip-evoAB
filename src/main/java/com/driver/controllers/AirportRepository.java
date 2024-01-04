@@ -12,20 +12,20 @@ import java.util.*;
 @Repository
 public class AirportRepository {
 
-    HashMap<String , Airport> aDb  = new HashMap<>();
+    HashMap<String , Airport> airportDB  = new HashMap<>();
 
-    HashMap<Integer , Flight> fDb  = new HashMap<>();
+    HashMap<Integer , Flight> flightDB  = new HashMap<>();
 
-    HashMap<Integer , Passenger> pDb  = new HashMap<>();
+    HashMap<Integer , Passenger> passengerDB  = new HashMap<>();
 
-    HashMap<Integer , List<Integer>> tDb  = new HashMap<>();
+    HashMap<Integer , List<Integer>> passengerInFlightDB  = new HashMap<>();
     public void addAirport(Airport a){
-        aDb.put(a.getAirportName() , a);
+        airportDB.put(a.getAirportName() , a);
     }
     public String bookATicket(Integer fightId  , Integer passengerId){
-        Flight f  = fDb.get(fightId);
+        Flight f  = flightDB.get(fightId);
         int max  = f.getMaxCapacity();
-        List<Integer> temp  = tDb.getOrDefault(fightId , new ArrayList<>());
+        List<Integer> temp  = passengerInFlightDB.getOrDefault(fightId , new ArrayList<>());
         if(temp.size()>max) return "FAILURE";
         if(!temp.isEmpty()) {
             for (Integer i : temp) {
@@ -34,17 +34,17 @@ public class AirportRepository {
             }
         }
         temp.add(passengerId);
-        tDb.put(fightId , temp);
+        passengerInFlightDB.put(fightId , temp);
         return "SUCCESS";
     }
     public void addPassenger(Passenger p){
-        pDb.put(p.getPassengerId() , p);
+        passengerDB.put(p.getPassengerId() , p);
     }
     public String getLargestAirportName(){
         int max  = 0;
         List<String> al  = new ArrayList<>();
-        for(String s: aDb.keySet()){
-            Airport temp  = aDb.get(s);
+        for(String s: airportDB.keySet()){
+            Airport temp  = airportDB.get(s);
             int terminal  = temp.getNoOfTerminals();
             if(max<terminal){
                 max  = terminal;
@@ -68,13 +68,13 @@ public class AirportRepository {
     }
 
     public void addFlight(Flight f){
-        fDb.put(f.getFlightId() , f);
+        flightDB.put(f.getFlightId() , f);
     }
 
     public double getShortestDurationOfPossibleBetweenTwoCities(City from ,City to){
         double ans = Double.MAX_VALUE;
-        for(Integer i : fDb.keySet()){
-            Flight f  = fDb.get(i);
+        for(Integer i : flightDB.keySet()){
+            Flight f  = flightDB.get(i);
             double time  = f.getDuration();
             City fromcity = f.getFromCity();
             City toCity  = f.getToCity();
@@ -88,15 +88,15 @@ public class AirportRepository {
 
     public int getNumberOfPeopleOn(Date date , String airPortName){
         int pans  = 0;
-        for(String a : aDb.keySet()){
+        for(String a : airportDB.keySet()){
             if(a.equals(airPortName)){
-                Airport airport  = aDb.get(a);
+                Airport airport  = airportDB.get(a);
                 City city  = airport.getCity();
-                for(Integer i : tDb.keySet()){
-                    Flight f = fDb.get(i);
+                for(Integer i : passengerInFlightDB.keySet()){
+                    Flight f = flightDB.get(i);
                     if(f.getToCity()==city||f.getFromCity()==city){
                         if(date.compareTo(f.getFlightDate())==0) {
-                            List<Integer> al  = tDb.get(i);
+                            List<Integer> al  = passengerInFlightDB.get(i);
                             pans += al.size();
                         }
                     }
@@ -107,14 +107,14 @@ public class AirportRepository {
     }
 
     public int calculateFlightFare(Integer flightId){
-        List<Integer> temp  = tDb.get(flightId);
+        List<Integer> temp  = passengerInFlightDB.get(flightId);
         int n  = temp.size();
         return 3000+n*50;
     }
 
-    public String cancelATicket(Integer fId , Integer pId){
-        if(!fDb.containsKey(fId)) return "FAILURE";
-        List<Integer> temp  = tDb.getOrDefault(fId , new ArrayList<>());
+    public String cancelATicket(Integer flghtId , Integer pId){
+        if(!flightDB.containsKey(flghtId)) return "FAILURE";
+        List<Integer> temp  = passengerInFlightDB.getOrDefault(flghtId , new ArrayList<>());
         int s  = -1;
         if(!temp.isEmpty()) {
             for (Integer i : temp) {
@@ -126,15 +126,15 @@ public class AirportRepository {
             if (s == -1) return "FAILURE";
         }
         else{
-            tDb.put(fId , temp);
+            passengerInFlightDB.put(flghtId , temp);
         }
         return "SUCCESS";
     }
 
     public int countOfBookingsDoneByPassengerAllCombined(Integer pId){
         int count  = 0;
-        for(Integer f : tDb.keySet()){
-            List<Integer> temp = tDb.get(f);
+        for(Integer f : passengerInFlightDB.keySet()){
+            List<Integer> temp = passengerInFlightDB.get(f);
             for(Integer i : temp){
                 if(Objects.equals(i, pId))
                     count++;
@@ -143,13 +143,13 @@ public class AirportRepository {
         return count;
     }
 
-    public String getAirportNameFromFlightId(Integer fId){
-        if(!fDb.containsKey(fId)) return null;
+    public String getAirportNameFromFlightId(Integer flghtId){
+        if(!flightDB.containsKey(flghtId)) return null;
 
-        Flight flight  = fDb.get(fId);
+        Flight flight  = flightDB.get(flghtId);
         City city  = flight.getFromCity();
-        for(String name : aDb.keySet()){
-            Airport a  = aDb.get(name);
+        for(String name : airportDB.keySet()){
+            Airport a  = airportDB.get(name);
             City acity  = a.getCity();
             if(acity==city)
                 return name;
@@ -157,9 +157,9 @@ public class AirportRepository {
         return null;
     }
 
-    public int calculateRevenueOfAFlight(Integer fId){
+    public int calculateRevenueOfAFlight(Integer flghtId){
         int pans  = 0;
-        List<Integer> temp  = tDb.get(fId);
+        List<Integer> temp  = passengerInFlightDB.get(flghtId);
         if(temp.isEmpty()){
             return 0;
         }
